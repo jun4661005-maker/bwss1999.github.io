@@ -154,7 +154,7 @@
             background-color: #fff;
         }
 
-        /* --- 快捷連結區 (響應式手風琴/網格) --- */
+        /* --- 快捷連結區 --- */
         .quick-links {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -353,43 +353,40 @@
             <a href="#">最新消息</a>
         </nav>
     </header>
-<!-- 7張圖片與中央文字輪播區 -->
-<div class="hero-slider">
-    <div class="slides">
-        <div class="slide active" style="background-image: url('https://lh3.googleusercontent.com/d/17FUn8A3nL8-zv7el9OQ3__zkUCNGSH09');">
-            <h1>兒童遊戲池</h1>
-            <p>安全戲水 活力無限</p>
+
+    <!-- 7張圖片與中央文字輪播區 (已修正結構與雲端硬碟連結格式) -->
+    <div class="hero-slider">
+        <div class="slides">
+            <div class="slide active" style="background-image: url('https://docs.google.com/uc?export=view&id=17FUn8A3nL8-zv7el9OQ3__zkUCNGSH09');">
+                <h1>兒童遊戲池</h1>
+                <p>安全戲水 活力無限</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1rS2lhmiEs79Ar8qXCDXi57w-Oi26fhN9');">
+                <h1>室內溫水游泳池</h1>
+                <p>暢游健康 專業舒適</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1P_OzuMyfsqQYhfq0p-JIRyy1bi49Lit7');">
+                <h1>SPA按摩水療池</h1>
+                <p>活水舒壓 釋放疲勞</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1igotg2flZy2GrceY6DckfFLmhqYWj8kJ');">
+                <h1>高溫熱水池</h1>
+                <p>深層放鬆 養生首選</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1z0ocWi43_5x6K0Ei0F_ybN3NTRC5s2eE');">
+                <h1>多功能教室</h1>
+                <p>豐富課程 專業師資</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1AxdsgVN1DUXMMNuYHX5taxXOTG4R5UfE');">
+                <h1>專業健身設備</h1>
+                <p>燃脂增肌 健康體態</p>
+            </div>
+            <div class="slide" style="background-image: url('https://docs.google.com/uc?export=view&id=1JVGALoqruX7c3bDG4gEwZ4cgkqErbyg8');">
+                <h1>兒童遊戲室</h1>
+                <p>快樂成長 歡樂時光</p>
+            </div>
         </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1rS2lhmiEs79Ar8qXCDXi57w-Oi26fhN9');">
-            <h1>室內溫水游泳池</h1>
-            <p>暢游健康 專業舒適</p>
-        </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1P_OzuMyfsqQYhfq0p-JIRyy1bi49Lit7');">
-            <h1>SPA按摩水療池</h1>
-            <p>活水舒壓 釋放疲勞</p>
-        </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1igotg2flZy2GrceY6DckfFLmhqYWj8kJ');">
-            <h1>高溫熱水池</h1>
-            <p>深層放鬆 養生首選</p>
-        </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1z0ocWi43_5x6K0Ei0F_ybN3NTRC5s2eE');">
-            <h1>多功能教室</h1>
-            <p>豐富課程 專業師資</p>
-        </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1AxdsgVN1DUXMMNuYHX5taxXOTG4R5UfE');">
-            <h1>專業健身設備</h1>
-            <p>燃脂增肌 健康體態</p>
-        </div>
-        <div class="slide" style="background-image: url('https://lh3.googleusercontent.com/d/1JVGALoqruX7c3bDG4gEwZ4cgkqErbyg8');">
-            <h1>兒童遊戲室</h1>
-            <p>快樂成長 歡樂時光</p>
-        </div>
-    </div>
-    <!-- 下方 dots 保持不變 -->
-    <div class="slider-dots">
-        ...
-    </div>
-</div>
+        <!-- 導覽圓點區 -->
         <div class="slider-dots">
             <span class="dot active"></span>
             <span class="dot"></span>
@@ -467,7 +464,6 @@
 
     <script>
         // 1. --- 溫度與時間自動更新邏輯 ---
-        // ⚠️ 請將下方引號內文字替換為您部署完產生的 Google Apps Script 網頁應用程式 URL
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby4uYR7NN-f1ynLI1m66REOygilUroM8eG4sCdw0K8h1v9YcPkCKA2OKA3fZ8s-FPS2Jw/exec";
 
         function updateWaterTemperature() {
@@ -478,11 +474,9 @@
             const currentDay = now.getDay(); 
             const currentHour = now.getHours();
 
-            // 判斷時間是否在：星期二(2)到星期日(0) 且 在 13:00 到 22:00 之間 (13 <= hour < 22)
             const isBusinessHours = (currentDay !== 1) && (currentHour >= 13 && currentHour < 22);
 
             if (!isBusinessHours) {
-                // 非指定時間，強制顯示「尚未測量」
                 document.getElementById('long-pool').innerText = "尚未測量";
                 document.getElementById('spa-pool').innerText = "尚未測量";
                 document.getElementById('oxygen-pool').innerText = "尚未測量";
@@ -490,14 +484,13 @@
                 return;
             }
 
-            // 指定時間內，向後端 API 取得表單最新資料
             fetch(GAS_API_URL)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('long-pool').innerText = data.longPool;
-                    document.getElementById('spa-pool').innerText = data.spaPool;
-                    document.getElementById('oxygen-pool').innerText = data.oxygenPool;
-                    document.getElementById('child-pool').innerText = data.childPool;
+                    document.getElementById('long-pool').innerText = data.longPool || "尚未測量";
+                    document.getElementById('spa-pool').innerText = data.spaPool || "尚未測量";
+                    document.getElementById('oxygen-pool').innerText = data.oxygenPool || "尚未測量";
+                    document.getElementById('child-pool').innerText = data.childPool || "尚未測量";
                 })
                 .catch(error => {
                     console.error("無法讀取資料:", error);
@@ -508,7 +501,6 @@
                 });
         }
 
-        // 初始化溫度讀取並設定每分鐘 (60000 毫秒) 更新
         updateWaterTemperature();
         setInterval(updateWaterTemperature, 60000);
 
@@ -522,8 +514,8 @@
         function showSlide(index) {
             slides.forEach(slide => slide.classList.remove('active'));
             dots.forEach(dot => dot.classList.remove('active'));
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
+            if(slides[index]) slides[index].classList.add('active');
+            if(dots[index]) dots[index].classList.add('active');
         }
 
         function nextSlide() {
@@ -532,19 +524,18 @@
         }
 
         function startSlideShow() {
-            slideInterval = setInterval(nextSlide, 4000); // 每 4 秒自動切換
+            slideInterval = setInterval(nextSlide, 4000);
         }
 
         dots.forEach((dot, index) => {
             dot.addEventListener('click', () => {
                 currentSlide = index;
                 showSlide(currentSlide);
-                clearInterval(slideInterval); // 使用者手動點擊後重置計時器
+                clearInterval(slideInterval);
                 startSlideShow();
             });
         });
 
-        // 啟動自動輪播
         startSlideShow();
     </script>
 </body>
