@@ -2,52 +2,184 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>我的教室行事曆</title>
-    <!-- 引入 FullCalendar 的 樣式與 檔案 (CDN) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美河市運動會館 - 教室行事曆</title>
+    
+    <!-- 引入 FullCalendar 樣式與核心檔案 (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        #calendar { max-width: 900px; margin: 0 auto; }
-        #loading { text-align: center; color: #666; font-size: 18px; }
+        /* 基礎樣式重設與字體 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif; color: #333; background-color: #f8f9fa; }
+        
+        /* 頂部導覽列 */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: #fff; border-bottom: 1px solid #eaeaea; }
+        .logo { font-size: 1.2rem; font-weight: bold; color: #555; }
+        nav a { text-decoration: none; color: #666; margin-left: 20px; font-size: 0.95rem; }
+        nav a.active { color: #d32f2f; font-weight: bold; border-bottom: 2px solid #d32f2f; padding-bottom: 5px; }
+
+        /* 橫幅與標題區 */
+        .banner { background: linear-gradient(135deg, #e05c36 0%, #fa4623 100%); color: white; text-align: center; padding: 60px 20px; }
+        .banner h1 { font-size: 2.2rem; margin-bottom: 10px; font-weight: 500; }
+        .banner p { font-size: 1rem; opacity: 0.9; }
+
+        /* 預約須知區塊 */
+        .notice-container { max-width: 900px; margin: 30px auto 0 auto; padding: 0 20px; }
+        .notice-box { background-color: #fff; padding: 20px; border-radius: 8px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .notice-box h3 { color: #d32f2f; font-size: 1.1rem; margin-bottom: 8px; }
+        .notice-box p { color: #666; font-size: 0.9rem; line-height: 1.5; }
+        .notice-box strong { color: #333; }
+
+        /* 主要內容區與狀態標籤 */
+        .main-content { max-width: 900px; margin: 30px auto 60px auto; padding: 0 20px; }
+        .section-title { font-size: 1.5rem; margin-bottom: 15px; font-weight: bold; color: #222; }
+        
+        .legend-container { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; font-size: 0.85rem; color: #555; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; }
+        
+        /* 定義行事曆標籤色彩 (對應會館視覺) */
+        .bg-course { background-color: #1a73e8; }      /* 會館課程 */
+        .bg-rented { background-color: #e67c73; }      /* 已租借 */
+        .bg-longrent { background-color: #f6bf26; }    /* 長租 */
+        .bg-available { background-color: #33b679; }   /* 可預約 */
+
+        /* FullCalendar 客製化樣式調整 */
+        #calendar-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #666; z-index: 10; }
+        
+        /* 頁尾 */
+        footer { background-color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; color: #777; border-top: 1px solid #eaeaea; line-height: 1.8; }
+
+        /* 行事曆事件文字修飾 */
+        .fc-event { border: none !important; padding: 2px 4px; border-radius: 3px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loading">日曆資料載入中...</div>
-    <div id="calendar"></div>
+    <!-- 頂部導覽列 -->
+    <header>
+        <div class="logo">美河市會館</div>
+        <nav>
+            <a href="#">首頁</a>
+            <a href="#">會館設施</a>
+            <a href="#" class="active">教室行事曆</a>
+            <a href="#">最新消息</a>
+        </nav>
+    </header>
+
+    <!-- 橫幅區 -->
+    <div class="banner">
+        <h1>韻律教室預約</h1>
+        <p>查看會館課程與租借時段</p>
+    </div>
+
+    <!-- 預約須知 -->
+    <div class="notice-container">
+        <div class="notice-box">
+            <h3>預約須知</h3>
+            <p>韻律教室開放 <strong>7 日內</strong> 預約，請先至櫃檯登記扣點後才算預約完成。</p>
+        </div>
+    </div>
+
+    <!-- 主要行事曆區塊 -->
+    <div class="main-content">
+        <div class="section-title">教室行事曆</div>
+        
+        <!-- 狀態標籤對照表 -->
+        <div class="legend-container">
+            <div class="legend-item"><div class="legend-color bg-course"></div>會館課程</div>
+            <div class="legend-item"><div class="legend-color bg-rented"></div>已租借</div>
+            <div class="legend-item"><div class="legend-color bg-longrent"></div>長租</div>
+            <div class="legend-item"><div class="legend-color bg-available"></div>可預約</div>
+        </div>
+
+        <!-- 日曆本體 -->
+        <div id="calendar-container">
+            <div id="loading">日曆資料載入中...</div>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    <footer>
+        <p><strong>美河市運動會館</strong> | 管理單位: 奕澤健康事業有限公司</p>
+        <p>營業時間: 週二至週日 13:00 - 22:00 | 聯絡電話: 02-29106346</p>
+    </footer>
 
     <script>
-        // 1. 貼上你在 GAS 部署後取得的 Web App URL
-        const GAS_URL = "將你的GAS_WEB_APP_URL貼在這裡";
+        // 🛠️ 填入你部署好的 GAS Web App URL
+        const GAS_URL = "你的_GAS_WEB_APP_URL"; 
 
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
             const loadingEl = document.getElementById('loading');
 
-            // 2. 使用 fetch 向 GAS 請求日曆資料
+            // 向 GAS 請求 Google Calendar 資料
             fetch(GAS_URL)
                 .then(response => response.json())
                 .then(eventsData => {
-                    // 隱藏載入中文字
+                    // 隱藏載入提示
                     loadingEl.style.display = 'none';
 
-                    // 3. 初始化 FullCalendar 並渲染資料
+                    // 轉換資料格式以符合 FullCalendar 顏色歸類
+                    // 提示：你可以在 Google 日曆的行程「標題」或「描述」中加入關鍵字，這裡會自動分類顏色
+                    const formattedEvents = eventsData.map(event => {
+                        let color = '#e67c73'; // 預設：已租借 (紅)
+                        
+                        if (event.title.includes('課程') || event.title.includes('瑜珈') || event.title.includes('MV')) {
+                            color = '#1a73e8'; // 會館課程 (藍)
+                        } else if (event.title.includes('長租')) {
+                            color = '#f6bf26'; // 長租 (黃)
+                        } else if (event.title.includes('可預約')) {
+                            color = '#33b679'; // 可預約 (綠)
+                        }
+
+                        return {
+                            title: event.title,
+                            start: event.start,
+                            end: event.end,
+                            backgroundColor: color,
+                            extendedProps: {
+                                description: event.description || '',
+                                location: event.location || ''
+                            }
+                        };
+                    });
+
+                    // 初始化日曆
                     const calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth', // 預設顯示月分
-                        locale: 'zh-tw',            // 繁體中文
+                        initialView: 'dayGridMonth',
+                        locale: 'zh-tw',
+                        firstDay: 0, // 從週日開始
                         headerToolbar: {
                             left: 'prev,next today',
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,listWeek'
                         },
-                        events: eventsData // 直接把 GAS 的 JSON 陣列丟進去
+                        buttonText: {
+                            today: '今天',
+                            month: '月',
+                            week: '週',
+                            list: '清單'
+                        },
+                        events: formattedEvents,
+                        // 點擊行程時跳出簡單提示（可依需求改為 Modal 彈窗）
+                        eventClick: function(info) {
+                            let msg = `行程：${info.event.title}`;
+                            if(info.event.extendedProps.description) {
+                                msg += `\n備註：${info.event.extendedProps.description}`;
+                            }
+                            alert(msg);
+                        }
                     });
                     
                     calendar.render();
                 })
                 .catch(error => {
-                    console.error("載入日曆失敗:", error);
-                    loadingEl.innerText = "日曆載入失敗，請稍後再試。";
+                    console.error("日曆載入失敗:", error);
+                    loadingEl.innerText = "日曆載入失敗，請檢查網路或 API 設定。";
                 });
         });
     </script>
