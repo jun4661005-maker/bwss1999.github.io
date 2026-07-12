@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美河市運動會館 - 教室行事曆</title>
     
-    <!-- 引入 FullCalendar 官方樣式與核心檔案 (CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-    
     <style>
         /* 基礎樣式重設與字體 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,29 +28,24 @@
         .notice-box p { color: #666; font-size: 0.9rem; line-height: 1.5; }
         .notice-box strong { color: #333; }
 
-        /* 主要內容區與狀態標籤 */
+        /* 主要內容區 */
         .main-content { max-width: 900px; margin: 30px auto 60px auto; padding: 0 20px; }
         .section-title { font-size: 1.5rem; margin-bottom: 15px; font-weight: bold; color: #222; }
-        
-        .legend-container { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; font-size: 0.85rem; color: #555; }
-        .legend-color { width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; }
-        
-        /* 定義行事曆標籤色彩 (對應會館視覺) */
-        .bg-course { background-color: #1a73e8; }      /* 會館課程 */
-        .bg-rented { background-color: #e67c73; }      /* 已租借 */
-        .bg-longrent { background-color: #f6bf26; }    /* 長租 */
-        .bg-available { background-color: #33b679; }   /* 可預約 */
 
-        /* FullCalendar 客製化樣式調整 */
-        #calendar-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; min-height: 400px; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #666; z-index: 10; }
+        /* 條列式行事曆容器樣式 */
+        #calendar-container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        #loading { text-align: center; font-size: 1.1rem; color: #666; padding: 20px 0; }
         
+        /* 條列清單樣式 */
+        .event-list { list-style: none; }
+        .event-item { padding: 15px 0; border-bottom: 1px solid #eee; }
+        .event-item:last-child { border-bottom: none; }
+        .event-title { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 5px; }
+        .event-time { font-size: 0.9rem; color: #666; }
+        .no-events { text-align: center; color: #888; padding: 20px 0; }
+
         /* 頁尾 */
         footer { background-color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; color: #777; border-top: 1px solid #eaeaea; line-height: 1.8; }
-
-        /* 行事曆事件文字修飾 */
-        .fc-event { border: none !important; padding: 2px 4px; border-radius: 3px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -85,20 +77,12 @@
 
     <!-- 主要行事曆區塊 -->
     <div class="main-content">
-        <div class="section-title">教室行事曆</div>
-        
-        <!-- 狀態標籤對照表 -->
-        <div class="legend-container">
-            <div class="legend-item"><div class="legend-color bg-course"></div>會館課程</div>
-            <div class="legend-item"><div class="legend-color bg-rented"></div>已租借</div>
-            <div class="legend-item"><div class="legend-color bg-longrent"></div>長租</div>
-            <div class="legend-item"><div class="legend-color bg-available"></div>可預約</div>
-        </div>
+        <div class="section-title">教室近期日程</div>
 
-        <!-- 日曆本體目標 DIV -->
+        <!-- 日曆資料輸出目標 DIV -->
         <div id="calendar-container">
             <div id="loading">日曆資料載入中...</div>
-            <div id="calendar"></div>
+            <div id="calendar-data"></div>
         </div>
     </div>
 
@@ -109,70 +93,48 @@
     </footer>
 
     <script>
-        // 🛠️ 妳部署好的 GAS Web App URL
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec"; 
+        // GAS Web App URL
+        const gasUrl = "https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec"; 
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const calendarEl = document.getElementById('calendar');
+        async function fetchCalendar() {
             const loadingEl = document.getElementById('loading');
-
-            // 向 GAS 請求 Google Calendar 資料
-            fetch(GAS_URL)
-                .then(response => response.json())
-                .then(eventsData => {
-                    // 隱藏載入提示
-                    loadingEl.style.display = 'none';
-
-                    // 轉換資料格式以符合 FullCalendar 的格式與顏色歸類
-                    const formattedEvents = eventsData.map(event => {
-                        let color = '#e67c73'; // 預設：已租借 (紅)
-                        
-                        // 根據 Google 日曆中的行程標題關鍵字自動分類顏色
-                        if (event.title.includes('課程') || event.title.includes('瑜珈') || event.title.includes('MV') || event.title.includes('有氧')) {
-                            color = '#1a73e8'; // 會館課程 (藍)
-                        } else if (event.title.includes('長租')) {
-                            color = '#f6bf26'; // 長租 (黃)
-                        } else if (event.title.includes('可預約')) {
-                            color = '#33b679'; // 可預約 (綠)
-                        }
-
-                        return {
-                            title: event.title,
-                            start: event.startTime, // 對應 GAS 輸出的 startTime
-                            end: event.endTime,     // 對應 GAS 輸出的 endTime
-                            backgroundColor: color
-                        };
-                    });
-
-                    // 初始化 FullCalendar 並渲染至 #calendar 中
-                    const calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth',
-                        locale: 'zh-tw',
-                        firstDay: 1, // 從週一開始顯示（若要週日改成 0）
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,listWeek'
-                        },
-                        buttonText: {
-                            today: '今天',
-                            month: '月',
-                            week: '週',
-                            list: '清單'
-                        },
-                        events: formattedEvents,
-                        eventClick: function(info) {
-                            alert(`行程名稱：${info.event.title}\n時間：${info.event.start.toLocaleString('zh-TW')}`);
-                        }
-                    });
-                    
-                    calendar.render();
-                })
-                .catch(error => {
-                    console.error("日曆載入失敗:", error);
-                    loadingEl.innerText = "日曆載入失敗，請檢查網路或 API 設定。";
+            const targetDiv = document.getElementById('calendar-data');
+            
+            try {
+                const response = await fetch(gasUrl);
+                const events = await response.json();
+                
+                // 隱藏載入中文字
+                loadingEl.style.display = 'none';
+                
+                if (!events || events.length === 0) {
+                    targetDiv.innerHTML = '<p class="no-events">近期沒有活動日程。</p>';
+                    return;
+                }
+                
+                // 依序組裝 HTML 純文字列表
+                let htmlContent = '<ul class="event-list">';
+                events.forEach(event => {
+                    htmlContent += `
+                        <li class="event-item">
+                            <div class="event-title">${event.title}</div>
+                            <div class="event-time">時間：${event.startTime} ～ ${event.endTime}</div>
+                        </li>`;
                 });
-        });
+                htmlContent += '</ul>';
+                
+                // 輸出到網頁的 DIV 中
+                targetDiv.innerHTML = htmlContent;
+                
+            } catch (error) {
+                console.error('預覽日曆失敗:', error);
+                loadingEl.style.display = 'none';
+                targetDiv.innerHTML = '<p class="no-events" style="color: #d32f2f;">無法載入日曆資料，請確認 API 權限或網路連線。</p>';
+            }
+        }
+
+        // 網頁載入完成後執行
+        document.addEventListener('DOMContentLoaded', fetchCalendar);
     </script>
 </body>
 </html>
