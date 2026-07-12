@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美河市運動會館 - 教室行事曆</title>
     
-    <!-- 引入 FullCalendar 樣式與核心檔案 (CDN) -->
-    <script src="https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec"></script>
+    <!-- 引入 FullCalendar 官方樣式與核心檔案 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     
     <style>
         /* 基礎樣式重設與字體 */
@@ -46,7 +46,7 @@
         .bg-available { background-color: #33b679; }   /* 可預約 */
 
         /* FullCalendar 客製化樣式調整 */
-        #calendar-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; }
+        #calendar-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; min-height: 400px; }
         #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #666; z-index: 10; }
         
         /* 頁尾 */
@@ -95,7 +95,7 @@
             <div class="legend-item"><div class="legend-color bg-available"></div>可預約</div>
         </div>
 
-        <!-- 日曆本體 -->
+        <!-- 日曆本體目標 DIV -->
         <div id="calendar-container">
             <div id="loading">日曆資料載入中...</div>
             <div id="calendar"></div>
@@ -109,7 +109,7 @@
     </footer>
 
     <script>
-        // 🛠️ 填入你部署好的 GAS Web App URL
+        // 🛠️ 妳部署好的 GAS Web App URL
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec"; 
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -123,12 +123,12 @@
                     // 隱藏載入提示
                     loadingEl.style.display = 'none';
 
-                    // 轉換資料格式以符合 FullCalendar 顏色歸類
-                    // 提示：你可以在 Google 日曆的行程「標題」或「描述」中加入關鍵字，這裡會自動分類顏色
+                    // 轉換資料格式以符合 FullCalendar 的格式與顏色歸類
                     const formattedEvents = eventsData.map(event => {
                         let color = '#e67c73'; // 預設：已租借 (紅)
                         
-                        if (event.title.includes('課程') || event.title.includes('瑜珈') || event.title.includes('MV')) {
+                        // 根據 Google 日曆中的行程標題關鍵字自動分類顏色
+                        if (event.title.includes('課程') || event.title.includes('瑜珈') || event.title.includes('MV') || event.title.includes('有氧')) {
                             color = '#1a73e8'; // 會館課程 (藍)
                         } else if (event.title.includes('長租')) {
                             color = '#f6bf26'; // 長租 (黃)
@@ -138,21 +138,17 @@
 
                         return {
                             title: event.title,
-                            start: event.start,
-                            end: event.end,
-                            backgroundColor: color,
-                            extendedProps: {
-                                description: event.description || '',
-                                location: event.location || ''
-                            }
+                            start: event.startTime, // 對應 GAS 輸出的 startTime
+                            end: event.endTime,     // 對應 GAS 輸出的 endTime
+                            backgroundColor: color
                         };
                     });
 
-                    // 初始化日曆
+                    // 初始化 FullCalendar 並渲染至 #calendar 中
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: 'dayGridMonth',
                         locale: 'zh-tw',
-                        firstDay: 0, // 從週日開始
+                        firstDay: 1, // 從週一開始顯示（若要週日改成 0）
                         headerToolbar: {
                             left: 'prev,next today',
                             center: 'title',
@@ -165,13 +161,8 @@
                             list: '清單'
                         },
                         events: formattedEvents,
-                        // 點擊行程時跳出簡單提示（可依需求改為 Modal 彈窗）
                         eventClick: function(info) {
-                            let msg = `行程：${info.event.title}`;
-                            if(info.event.extendedProps.description) {
-                                msg += `\n備註：${info.event.extendedProps.description}`;
-                            }
-                            alert(msg);
+                            alert(`行程名稱：${info.event.title}\n時間：${info.event.start.toLocaleString('zh-TW')}`);
                         }
                     });
                     
@@ -182,44 +173,6 @@
                     loadingEl.innerText = "日曆載入失敗，請檢查網路或 API 設定。";
                 });
         });
-        // 替換成你在步驟二複製的 GAS 網頁應用程式 URL
-        const gasUrl = 'https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec'; 
-
-        async function fetchCalendar() {
-            try {
-                const response = await fetch(gasUrl);
-                const events = await response.json();
-                
-                const targetDiv = document.getElementById('calendar-data');
-                
-                if (events.length === 0) {
-                    targetDiv.innerHTML = '<p>近期沒有活動日程。</p>';
-                    return;
-                }
-                
-                // 組裝 HTML 結構
-                let htmlContent = '<ul>';
-                events.forEach(event => {
-                    htmlContent += `
-                        <li>
-                            <strong>${event.title}</strong><br>
-                            <small>時間：${event.startTime} ~ ${event.endTime}</small>
-                        </li>
-                        <hr>`;
-                });
-                htmlContent += '</ul>';
-                
-                // 輸出到指定的 DIV
-                targetDiv.innerHTML = calendar;
-                
-            } catch (error) {
-                console.error('預覽日曆失敗:', error);
-                document.getElementById('calendar-data').innerText = '無法載入日曆資料。';
-            }
-        }
-
-        // 執行函式
-        fetchCalendar();
     </script>
 </body>
 </html>
