@@ -182,6 +182,44 @@
                     loadingEl.innerText = "日曆載入失敗，請檢查網路或 API 設定。";
                 });
         });
+        // 替換成你在步驟二複製的 GAS 網頁應用程式 URL
+        const gasUrl = 'https://script.google.com/macros/s/AKfycbxI1fundi4AOJOL_5NQAzatPQH_bbaU_B58j18S-_8RyOCijvKj_hV8YZu3IAUGQVZP6A/exec'; 
+
+        async function fetchCalendar() {
+            try {
+                const response = await fetch(gasUrl);
+                const events = await response.json();
+                
+                const targetDiv = document.getElementById('calendar-data');
+                
+                if (events.length === 0) {
+                    targetDiv.innerHTML = '<p>近期沒有活動日程。</p>';
+                    return;
+                }
+                
+                // 組裝 HTML 結構
+                let htmlContent = '<ul>';
+                events.forEach(event => {
+                    htmlContent += `
+                        <li>
+                            <strong>${event.title}</strong><br>
+                            <small>時間：${event.startTime} ~ ${event.endTime}</small>
+                        </li>
+                        <hr>`;
+                });
+                htmlContent += '</ul>';
+                
+                // 輸出到指定的 DIV
+                targetDiv.innerHTML = htmlContent;
+                
+            } catch (error) {
+                console.error('預覽日曆失敗:', error);
+                document.getElementById('calendar-data').innerText = '無法載入日曆資料。';
+            }
+        }
+
+        // 執行函式
+        fetchCalendar();
     </script>
 </body>
 </html>
