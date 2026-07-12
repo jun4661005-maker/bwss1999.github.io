@@ -363,64 +363,10 @@
         <p>掌握會館最新動態與活動資訊</p>
     </div>
 
-    <div class="quick-links">
-        <a href="#" class="link-card">
-            <h3>📢 最新公告</h3>
-            <p>查看最新消息</p>
-        </a>
-        <a href="#" class="link-card">
-            <h3>🏛 會館介紹</h3>
-            <p>設施與服務</p>
-        </a>
-        <a href="#" class="link-card">
-            <h3>📅 教室行事曆</h3>
-            <p>查看教室時程</p>
-        </a>
-        <a href="#" class="link-card">
-            <h3>📞 聯絡我們</h3>
-            <p>洽詢與建議</p>
-        </a>
-    </div>
+   
 
-    <!-- 水池溫度即時上傳顯示區 -->
-    <div class="water-temp-section">
-        <div class="temp-container">
-            <div class="temp-header">
-                <span>🆗 今日水池溫度</span>
-                <span id="current-date-str">----年--月--日 週-</span>
-            </div>
-            <div class="temp-grid">
-                <div class="temp-item">
-                    <h4>長泳池</h4>
-                    <div class="val" id="long-pool">讀取中...</div>
-                </div>
-                <div class="temp-item">
-                    <h4>SPA池</h4>
-                    <div class="val" id="spa-pool">讀取中...</div>
-                </div>
-                <div class="temp-item">
-                    <h4>高氧池</h4>
-                    <div class="val" id="oxygen-pool">讀取中...</div>
-                </div>
-                <div class="temp-item">
-                    <h4>兒童池</h4>
-                    <div class="val" id="child-pool">讀取中...</div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
-    <div class="news-section">
-        <h2>📄 最新消息 <a href="#">查看更多 →</a></h2>
-        <div class="news-item">
-            <h3><span style="color:red;">[置頂]</span> 會館兒童.清明連假開館時間調整</h3>
-            <span class="date">4/4</span>
-        </div>
-        <div class="news-item">
-            <h3>會館農曆年節休館公告</h3>
-            <span class="date">1/8</span>
-        </div>
-    </div>
 
     <footer>
         <p>美河市運動會館 | 管理單位: 藍鯨游泳學校</p>
@@ -428,80 +374,7 @@
     </footer>
 
     <script>
-        // 1. --- 溫度與時間自動更新邏輯 ---
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby4uYR7NN-f1ynLI1m66REOygilUroM8eG4sCdw0K8h1v9YcPkCKA2OKA3fZ8s-FPS2Jw/exec";
-
-        function updateWaterTemperature() {
-            const now = new Date();
-            const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-            document.getElementById('current-date-str').innerText = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${days[now.getDay()]}`;
-
-            const currentDay = now.getDay(); 
-            const currentHour = now.getHours();
-
-            const isBusinessHours = (currentDay !== 1) && (currentHour >= 13 && currentHour < 22);
-
-            if (!isBusinessHours) {
-                document.getElementById('long-pool').innerText = "尚未測量";
-                document.getElementById('spa-pool').innerText = "尚未測量";
-                document.getElementById('oxygen-pool').innerText = "尚未測量";
-                document.getElementById('child-pool').innerText = "尚未測量";
-                return;
-            }
-
-            fetch(GAS_API_URL)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('long-pool').innerText = data.longPool || "尚未測量";
-                    document.getElementById('spa-pool').innerText = data.spaPool || "尚未測量";
-                    document.getElementById('oxygen-pool').innerText = data.oxygenPool || "尚未測量";
-                    document.getElementById('child-pool').innerText = data.childPool || "尚未測量";
-                })
-                .catch(error => {
-                    console.error("無法讀取資料:", error);
-                    document.getElementById('long-pool').innerText = "尚未測量";
-                    document.getElementById('spa-pool').innerText = "尚未測量";
-                    document.getElementById('oxygen-pool').innerText = "尚未測量";
-                    document.getElementById('child-pool').innerText = "尚未測量";
-                });
-        }
-
-        updateWaterTemperature();
-        setInterval(updateWaterTemperature, 60000);
-
-
-        // 2. --- 7張圖片與文字輪播邏輯 ---
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-        let currentSlide = 0;
-        let slideInterval;
-
-        function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-            if(slides[index]) slides[index].classList.add('active');
-            if(dots[index]) dots[index].classList.add('active');
-        }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        }
-
-        function startSlideShow() {
-            slideInterval = setInterval(nextSlide, 4000);
-        }
-
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentSlide = index;
-                showSlide(currentSlide);
-                clearInterval(slideInterval);
-                startSlideShow();
-            });
-        });
-
-        startSlideShow();
+        
     </script>
 </body>
 </html>
