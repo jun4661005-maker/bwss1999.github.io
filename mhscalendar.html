@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>我的教室行事曆</title>
+    <!-- 引入 FullCalendar 的 樣式與 檔案 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #calendar { max-width: 900px; margin: 0 auto; }
+        #loading { text-align: center; color: #666; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">日曆資料載入中...</div>
+    <div id="calendar"></div>
+
+    <script>
+        // 1. 貼上你在 GAS 部署後取得的 Web App URL
+        const GAS_URL = "將你的GAS_WEB_APP_URL貼在這裡";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const loadingEl = document.getElementById('loading');
+
+            // 2. 使用 fetch 向 GAS 請求日曆資料
+            fetch(GAS_URL)
+                .then(response => response.json())
+                .then(eventsData => {
+                    // 隱藏載入中文字
+                    loadingEl.style.display = 'none';
+
+                    // 3. 初始化 FullCalendar 並渲染資料
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth', // 預設顯示月分
+                        locale: 'zh-tw',            // 繁體中文
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,listWeek'
+                        },
+                        events: eventsData // 直接把 GAS 的 JSON 陣列丟進去
+                    });
+                    
+                    calendar.render();
+                })
+                .catch(error => {
+                    console.error("載入日曆失敗:", error);
+                    loadingEl.innerText = "日曆載入失敗，請稍後再試。";
+                });
+        });
+    </script>
+</body>
+</html>
