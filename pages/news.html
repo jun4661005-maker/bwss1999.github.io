@@ -157,6 +157,27 @@
         .banner { background: linear-gradient(135deg, #e05c36 0%, #fa4623 100%); color: white; text-align: center; padding: 80px 20px; }
         .banner h1 { font-size: 2.5rem; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
         .banner p { font-size: 1.1rem; opacity: 0.9; font-style: italic; }
+        /* 主要內容包裝區 */
+        .main-content { max-width: 900px; margin: 50px auto 80px auto; padding: 0 20px; }
+        
+        /* 載入中與錯誤訊息提示 */
+        #loading-status { text-align: center; color: #777; font-size: 1.1rem; padding: 40px 0; }
+
+        /* 公告卡片樣式 */
+        .news-card { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 25px; border: 1px solid #f0f0f0; transition: transform 0.2s, box-shadow 0.2s; }
+        .news-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* 卡片內部的標題與標籤列 */
+        .news-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .news-title { font-size: 1.35rem; font-weight: bold; color: #222; text-decoration: none; }
+        .news-title:hover { color: #fa4623; }
+        
+        /* 置頂標籤 */
+        .badge-pin { background-color: #ff7675; color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
+
+        /* 日期與內文 */
+        .news-meta { display: flex; align-items: center; gap: 5px; color: #999; font-size: 0.9rem; margin-bottom: 15px; }
+        .news-content { color: #666; font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
 
         /* --- 快捷連結區 --- */
         .quick-links {
