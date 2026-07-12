@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美河市運動會館 - 最新消息</title>
+    <style>
+        /* 基礎樣式重設與字體 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Helvetica Neue", Helvetica, Arial, "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif; color: #333; background-color: #f8f9fa; }
+        
+        /* 頂部導覽列 */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: #fff; border-bottom: 1px solid #eaeaea; }
+        .logo { font-size: 1.2rem; font-weight: bold; color: #555; }
+        nav a { text-decoration: none; color: #666; margin-left: 20px; font-size: 0.95rem; }
+        nav a.active { color: #d32f2f; font-weight: bold; border-bottom: 2px solid #d32f2f; padding-bottom: 5px; }
 
+        /* 最新消息主要橫幅 (橘紅漸層) */
+        .banner { background: linear-gradient(135deg, #e05c36 0%, #fa4623 100%); color: white; text-align: center; padding: 80px 20px; }
+        .banner h1 { font-size: 2.5rem; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
+        .banner p { font-size: 1.1rem; opacity: 0.9; font-style: italic; }
+
+        /* 主要內容包裝區 */
+        .main-content { max-width: 900px; margin: 50px auto 80px auto; padding: 0 20px; }
+        
+        /* 載入中與錯誤訊息提示 */
+        #loading-status { text-align: center; color: #777; font-size: 1.1rem; padding: 40px 0; }
+
+        /* 公告卡片樣式 */
+        .news-card { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 25px; border: 1px solid #f0f0f0; transition: transform 0.2s, box-shadow 0.2s; }
+        .news-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* 卡片內部的標題與標籤列 */
+        .news-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .news-title { font-size: 1.35rem; font-weight: bold; color: #222; text-decoration: none; }
+        .news-title:hover { color: #fa4623; }
+        
+        /* 置頂標籤 */
+        .badge-pin { background-color: #ff7675; color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 3px; }
+
+        /* 日期與內文 */
+        .news-meta { display: flex; align-items: center; gap: 5px; color: #999; font-size: 0.9rem; margin-bottom: 15px; }
+        .news-content { color: #666; font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
+
+        /* 頁尾 */
+        footer { background-color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; color: #777; border-top: 1px solid #eaeaea; line-height: 1.8; display: flex; justify-content: space-between; max-width: 100%; padding: 20px 40px; background-color: #8c1c1c; color: #f5c5c5; }
+        footer a { color: #fff; text-decoration: none; }
+        .footer-left { text-align: left; }
+        .footer-right { text-align: right; }
+
+        @media (max-width: 600px) {
+            footer { flex-direction: column; text-align: center; gap: 10px; }
+            .footer-left, .footer-right { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <header>
+        <div class="logo">美河市會館</div>
+        <nav>
+            <a href="#">首頁</a>
+            <a href="#">會館設施</a>
+            <a href="#">教室行事曆</a>
+            <a href="#" class="active">最新消息</a>
+        </nav>
+    </header>
+
+    <!-- 橫幅區 -->
+    <div class="banner">
+        <h1>最新消息</h1>
+        <p>掌握會館最新動態與活動資訊</p>
+    </div>
+
+    <!-- 主要最新消息列表區 -->
+    <div class="main-content">
+        <div id="loading-status">最新消息載入中...</div>
+        <div id="news-list-container"></div>
+    </div>
+
+    <!-- 頁尾樣式 -->
+    <footer>
+        <div class="footer-left">
+            <strong>美河市運動會館</strong> | 管理單位: 奕澤健康事業有限公司
+        </div>
+        <div class="footer-right">
+            營業時間: 週二至週日 13:00 - 22:00 | 聯絡電話: 02-29106346
+        </div>
+    </footer>
+
+    <script>
+        // 🛠️ 請填入你部署好的 GAS 網頁應用程式 (Web App) URL
+        const GAS_NEWS_URL = "你的_GAS_WEB_APP_URL"; 
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('news-list-container');
+            const statusEl = document.getElementById('loading-status');
+
+            // 呼叫 GAS 取得最新消息資料
+            fetch(GAS_NEWS_URL)
+                .then(response => response.json())
+                .then(newsData => {
+                    // 隱藏載入中提示
+                    statusEl.style.display = 'none';
+
+                    if (!newsData || newsData.length === 0) {
+                        statusEl.innerText = "目前暫無最新消息。";
+                        statusEl.style.display = 'block';
+                        return;
+                    }
+
+                    // 尋訪資料並動態渲染 HTML 結構
+                    newsData.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'news-card';
+
+                        // 判斷是否需要顯示「置頂」標籤
+                        const pinBadge = item.isPinned ? `<span class="badge-pin">📌 置頂</span>` : '';
+
+                        card.innerHTML = `
+                            <div class="news-header">
+                                <a href="#" class="news-title">${item.title}</a>
+                                ${pinBadge}
+                            </div>
+                            <div class="news-meta">
+                                📅 ${item.date}
+                            </div>
+                            <div class="news-content">
+                                ${item.content || ''}
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error("無法載入最新消息:", error);
+                    statusEl.innerText = "資料載入失敗，請檢查網路或 API 設定。";
+                });
+        });
+    </script>
+</body>
+</html>
