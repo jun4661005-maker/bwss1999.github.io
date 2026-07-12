@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教室行事曆</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .calendar-title { text-align: center; color: #333; }
+        .legend { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; }
+        
+        /* 根據您的日曆分類設定顏色 */
+        .bg-close { background-color: #e06666; color: white; } /* 閉館休息 - 紅色 */
+        .bg-rented { background-color: #4da6ff; color: white; } /* 已租借 - 藍色 */
+        .bg-long { background-color: #2ecc71; color: white; } /* 長租 - 綠色 */
+        .bg-default { background-color: #95a5a6; color: white; }
+
+        .calendar-table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .calendar-table th, .calendar-table td { border: 1px solid #ddd; padding: 10px; width: 14.28%; vertical-align: top; height: 100px; }
+        .calendar-table th { background-color: #f2f2f2; text-align: center; height: auto; }
+        .date-num { font-weight: bold; margin-bottom: 5px; color: #666; }
+        .event-item { font-size: 12px; padding: 3px 6px; margin-bottom: 3px; border-radius: 3px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <h2 class="calendar-title">2026年1月 教室行事曆</h2>
+
+    <!-- 分類圖例 -->
+    <div class="legend">
+        <div class="legend-item"><div class="color-box bg-close"></div>閉館休息</div>
+        <div class="legend-item"><div class="color-box bg-rented"></div>已租借</div>
+        <div class="legend-item"><div class="color-box bg-long"></div>長租</div>
+    </div>
+
+    <!-- 行事曆表格 -->
+    <table class="calendar-table">
+        <thead>
+            <tr>
+                <th>週日</th><th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th><th>週六</th>
+            </tr>
+        </thead>
+        <tbody id="calendar-body">
+            <!-- 這裡會由 JavaScript 動態產生 -->
+        </tbody>
+    </table>
+
+    <script>
+        // 您的 GAS Web App 網址
+        const gasUrl = "https://script.google.com/macros/s/AKfycby8wFLVZXprwmBxoHYiW8yJ9JJirq7NT2LXw9utW-LDgaoiuDlbjHLWgABwEh_Cq1lMNA/exec";
+
+        // 模擬串接與渲染（以 2026 年 1 月為例，對應範例網頁）
+        async function fetchCalendarData() {
+            try {
+                // 呼叫您的 GAS API
+                const response = await fetch(gasUrl);
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    renderCalendar(result.data);
+                } else {
+                    console.error("API 回傳失敗");
+                }
+            } catch (error) {
+                console.error("無法取得日曆資料:", error);
+            }
+        }
+
+        function renderCalendar(events) {
+            const tbody = document.getElementById("calendar-body");
+            tbody.innerHTML = ""; // 清空舊資料
+
+            // 2026年1月1日是週四，前四格留空（12月28~31日）
+            // 這裡簡單用固定的 2026 年 1 月結構示範排版
+            let startDayOfWeek = 4; 
+            let totalDays = 31;
+            let dateCounter = 1;
+            
+            for (let i = 0; i < 6; i++) { // 最多6週
+                let row = document.createElement("tr");
+                let hasData = false;
+
+                for (let j = 0; j < 7; j++) {
+                    let cell = document.createElement("td");
+                    
+                    if ((i === 0 && j < startDayOfWeek) || dateCounter > totalDays) {
+                        // 格子留空
+                        cell.innerHTML = "";
+                    } else {
+                        hasData = true;
+                        let currentDay = dateCounter;
+                        
+                        // 建立日期標籤
+                        let dateDiv = document.createElement("div");
+                        dateDiv.className = "date-num";
+                        dateDiv.innerText = currentDay + "日";
+                        cell.appendChild(dateDiv);
+
+                        // 篩選出屬於這一天的行程
+                        // 註：您的 GAS 撈出的 start 時間為 ISO 字串 (如 2026-01-05T05:00:00.000Z)
+                        let targetDateStr = `2026-01-${String(currentDay).padStart(2, '0')}`;
+                        let dayEvents = events.filter(e => e.start.startsWith(targetDateStr));
+
+                        // 將行程塞入格子
+                        dayEvents.forEach(ev => {
+                            let eventDiv = document.createElement("div");
+                            eventDiv.className = "event-item " + getColorClass(ev.calendarName);
+                            
+                            // 格式化時間 (如果是全天行程就不顯示時間)
+                            let timeStr = "";
+                            if (!ev.isAllDay) {
+                                let dateObj = new Date(ev.start);
+                                // 轉為在地時間的 小時:分鐘
+                                timeStr = dateObj.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }) + " ";
+                            }
+                            
+                            eventDiv.innerText = `${timeStr}${ev.title}`;
+                            cell.appendChild(eventDiv);
+                        });
+
+                        dateCounter++;
+                    }
+                    row.appendChild(cell);
+                }
+                if (!hasData && dateCounter > totalDays) break;
+                tbody.appendChild(row);
+            }
+        }
+
+        // 根據日曆名稱區分顏色
+        function getColorClass(calendarName) {
+            if (calendarName.includes("閉館休息")) return "bg-close";
+            if (calendarName.includes("已租借")) return "bg-rented";
+            if (calendarName.includes("長租")) return "bg-long";
+            return "bg-default";
+        }
+
+        // 初始化執行
+        fetchCalendarData();
+    </script>
+</body>
+</html>
