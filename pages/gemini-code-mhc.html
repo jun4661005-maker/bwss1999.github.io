@@ -252,10 +252,14 @@ function updateWaterTemperature() {
             document.getElementById('child-pool').innerText = "尚未測量";
         });
 
-    // 讀取餘氯資料
 // 讀取餘氯資料
 fetch(CHLORINE_GAS_API_URL)
-  .then(response => response.json())
+  .then(response => {
+      if (!response.ok) {
+          throw new Error('網路回應不正常');
+      }
+      return response.json();
+  })
   .then(data => {
       document.getElementById('chlorine-13').innerText = data.chlorine13 || "尚未測量";
       document.getElementById('chlorine-17').innerText = data.chlorine17 || "尚未測量";
@@ -263,6 +267,10 @@ fetch(CHLORINE_GAS_API_URL)
   })
   .catch(error => {
       console.error("無法讀取餘氯資料:", error);
+      // 若讀取失敗，將畫面上的「讀取中」改為「尚未測量」，避免卡死
+      document.getElementById('chlorine-13').innerText = "尚未測量";
+      document.getElementById('chlorine-17').innerText = "尚未測量";
+      document.getElementById('chlorine-21').innerText = "尚未測量";
   });
 }
 
